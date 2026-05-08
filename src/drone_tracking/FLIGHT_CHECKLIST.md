@@ -121,7 +121,7 @@ rosservice call /yaw_controller_node/enable_control "data: true"
 ```bash
 # 另开终端
 rostopic hz /detector_node/detection   # ≥ 8 Hz（推理正常）
-rostopic hz /mavros/setpoint_velocity/cmd_vel         # = 20 Hz（心跳正常）
+rostopic hz /px4ctrl/ext_yaw_rate         # = 20 Hz（心跳正常）
 rostopic echo /yaw_controller_node/control_active  # False（未使能）
 ```
 
@@ -157,7 +157,7 @@ rqt_image_view /detector_node/annotated_image/compressed
 
 ```bash
 # 确认 cmd_vel 心跳正常（必须先有 20 Hz 心跳才能切 OFFBOARD）
-rostopic hz /mavros/setpoint_velocity/cmd_vel  # 应显示 20.0 Hz
+rostopic hz /px4ctrl/ext_yaw_rate  # 应显示 20.0 Hz
 ```
 
 - [ ] `yaw_controller_node` 心跳正常（上步已确认）
@@ -266,7 +266,7 @@ rqt_plot /detector_node/detection/track_id
 | `/zedm/zed_node/pose` | `PoseStamped` | VIO 原始位姿 |
 | `/mavros/state` | `State` | 飞控连接/模式/解锁状态 |
 | `/mavros/local_position/pose` | `PoseStamped` | 飞控融合后位姿 |
-| `/mavros/setpoint_velocity/cmd_vel` | `TwistStamped` | 偏航指令（本系统输出）|
+| `/px4ctrl/ext_yaw_rate` | `TwistStamped` | 偏航指令（本系统输出，由 px4ctrl 融入悬停偏航）|
 | `/detector_node/detection` | `Detection` | 检测结果（cx/cy/error_x/track_id）|
 | `/detector_node/annotated_image/compressed` | `CompressedImage` | 标注画面（仅调试用，无订阅时不发布）|
 | `/yaw_controller_node/control_active` | `Bool` | 跟踪是否正在输出指令 |
