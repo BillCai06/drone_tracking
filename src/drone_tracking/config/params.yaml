@@ -1,0 +1,19 @@
+detector_node:
+  engine_path:    "/home/zd/tracking_ws/src/Scout-Vision/lrdd3_720_yolo26n.engine"
+  image_topic:    "/zedm/zed_node/left/image_rect_color"
+  use_compressed: true
+  conf:           0.06
+  iou:            0.50
+  class_id:       0          # 0 = drone class in lrdd3 model
+  device:         "cuda:0"
+  tracker:        "/home/zd/tracking_ws/src/Scout-Vision/bytetrack_drone.yaml"
+
+yaw_controller_node:
+  kp:                   1.0   # rad/s per normalized error_x unit (max |error_x|=0.5, so actual max rate = kp*0.5)
+                               # first flight: start at 0.3, increase if response is too slow
+  yaw_rate_max:         0.8   # rad/s hard clamp; only engages when kp > 1.6 with current error_x range
+                               # first flight: set to 0.3
+  deadband:             0.01  # normalized error_x units (~1.4% of FOV); suppresses noise-driven hunting
+  detection_stale_sec:  0.5
+  heartbeat_hz:         20.0  # must be >= 10 to maintain OFFBOARD mode
+  require_offboard:     true  # set false for bench testing without flight

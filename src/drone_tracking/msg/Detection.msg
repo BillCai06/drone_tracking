@@ -1,0 +1,9 @@
+std_msgs/Header header
+bool    detected
+float32 cx
+float32 cy
+float32 width
+float32 height
+float32 conf
+int32   track_id
+float32 error_x

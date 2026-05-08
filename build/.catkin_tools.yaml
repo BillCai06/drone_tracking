@@ -1,0 +1,6 @@
+devel_space: /home/zd/tracking_ws/devel
+install: false
+install_space: /home/zd/tracking_ws/install
+profile: default
+source_space: /home/zd/tracking_ws/src
+workspace: /home/zd/tracking_ws

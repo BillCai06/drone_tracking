@@ -1,0 +1,1 @@
+/home/zd/tracking_ws/devel/.private/drone_tracking/lib/drone_tracking/run_detector_conda.sh

@@ -1,0 +1,99 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Detection View1
+        - /Detection Status1
+      Splitter Ratio: 0.5
+    Tree Height: 549
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded: ~
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz/Views
+    Expanded: ~
+    Name: Views
+    Splitter Ratio: 0.5
+
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 1
+      Class: rviz/Image
+      Enabled: true
+      Image Topic: /drone_tracking/detector_node/annotated_image
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Detection View
+      Normalize Range: true
+      Queue Size: 1
+      Transport Hint: raw
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /drone_tracking/detector_node/status_marker
+      Name: Detection Status
+      Namespaces:
+        detection_status: true
+      Queue Size: 5
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Default Light: true
+    Fixed Frame: base_link
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Handle: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 5
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.785398006439209
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 0.785398006439209
+    Saved: ~
+Window Geometry:
+  Displays:
+    collapsed: false
+  Height: 846
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000004000000000000016a000002a0fc0200000008fb0000001200530065006c006500630074006900
+    6f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f00700065007200740069006500730100000188000001d60000005c00fffffffb0000002000730065006c006500630074006900
+    6f006e005f00700061006e0065006c003d0000061c00000196000000000000000000000001000001aa000002a0fc0200000002fb0000000800440069007300700000000069000002a0000000d800fffffffb0000002000730065006c006500630074006900
+    6f006e005f00700061006e00650000000069000000000000000000000000000001000000010000000000000000
+  Selection:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1200
+  X: 0
+  Y: 0

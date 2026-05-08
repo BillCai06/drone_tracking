@@ -1,0 +1,58 @@
+<launch>
+  <!-- ==================== Arguments ==================== -->
+  <!-- <arg name="engine_path"
+       default="/home/zd/tracking_ws/src/Scout-Vision/yolo26n_4datasets_720_finetuned.engine"/> -->
+  <arg name="engine_path"
+       default="/home/zd/tracking_ws/src/Scout-Vision/yolo26n_neo_720_v3.engine"/> 
+  <arg name="image_topic"      default="/zedm/zed_node/left/image_rect_color"/>
+  <arg name="use_compressed"   default="true"/>
+  <arg name="conf"             default="0.06"/>
+  <arg name="class_id"         default="0"/>
+
+  <arg name="kp"               default="1.0"/>
+  <arg name="yaw_rate_max"     default="0.8"/>
+  <arg name="require_offboard" default="true"/>
+  <arg name="auto_enable"      default="false"/>
+
+  <arg name="launch_rviz"      default="false"/>
+
+  <!-- ==================== Detector ==================== -->
+  <node pkg="drone_tracking"
+        type="run_detector_conda.sh"
+        name="detector_node"
+        output="screen"
+        respawn="false">
+    <param name="engine_path"    value="$(arg engine_path)"/>
+    <param name="image_topic"    value="$(arg image_topic)"/>
+    <param name="use_compressed" value="$(arg use_compressed)"/>
+    <param name="conf"           value="$(arg conf)"/>
+    <param name="class_id"       value="$(arg class_id)"/>
+    <param name="device"         value="cuda:0"/>
+    <param name="tracker"        value="/home/zd/tracking_ws/src/Scout-Vision/bytetrack_drone.yaml"/>
+  </node>
+
+  <!-- ==================== Yaw Controller ==================== -->
+  <node pkg="drone_tracking"
+        type="run_yaw_ctrl_conda.sh"
+        name="yaw_controller_node"
+        output="screen"
+        respawn="false">
+    <param name="kp"                  value="$(arg kp)"/>
+    <param name="yaw_rate_max"        value="$(arg yaw_rate_max)"/>
+    <param name="detection_stale_sec" value="0.5"/>
+    <param name="heartbeat_hz"        value="20.0"/>
+    <param name="require_offboard"    value="$(arg require_offboard)"/>
+  </node>
+
+  <!-- ==================== Auto-enable (optional) ==================== -->
+  <node if="$(arg auto_enable)"
+        pkg="rosservice" type="rosservice" name="auto_enable_control"
+        args="call --wait /yaw_controller_node/enable_control 'data: true'"
+        output="screen"/>
+
+  <!-- ==================== RViz (optional) ==================== -->
+  <node if="$(arg launch_rviz)"
+        pkg="rviz" type="rviz" name="rviz"
+        args="-d $(find drone_tracking)/rviz/drone_tracking.rviz"
+        output="screen"/>
+</launch>
