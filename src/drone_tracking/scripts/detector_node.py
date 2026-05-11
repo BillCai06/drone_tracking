@@ -136,8 +136,11 @@ class DetectorNode:
     # ------------------------------------------------------------------
     # Inference worker thread
     # ------------------------------------------------------------------
-
     def _infer_loop(self):
+
+        recent_frames = []
+        max_buffer_size = 5
+
         while not rospy.is_shutdown():
             try:
                 frame, header = self._q.get(timeout=0.1)
@@ -154,8 +157,28 @@ class DetectorNode:
 
             det = Detection()
             det.header   = header
-            det.detected = (box is not None)
-            if box is not None:
+            # Outlier Identification
+            is_outlier = False
+
+            if box is not None and recent_frames:
+                cx_curr, cy_curr = box.cx, box.cy
+
+                last_f = recent_frames[-1]
+                cx_last, cy_last = last_f['cx'], last_f['cy']
+                
+                # Euclidean distance
+                center_dist = np.hypot(cx_curr - cx_last, cy_curr - cy_last)
+                # Calculate diagonal of the previous B_box
+                last_diag = np.hypot(last_f['w'], last_f['h'])
+                # Outlier Criteria
+                max_recent_conf = max(f['conf'] for f in recent_frames)
+
+                if center_dist > (2 * last_diag) and box.conf <= max_recent_conf:
+                    rospy.logwarn(f"[detector] Outlier detected! Jump of {center_dist:.2f}")
+                    is_outlier = True
+
+            if box is not None and not is_outlier:
+                det.detected = True
                 det.cx       = box.cx
                 det.cy       = box.cy
                 det.width    = box.w
@@ -163,20 +186,26 @@ class DetectorNode:
                 det.conf     = box.conf
                 det.track_id = box.track_id if box.track_id is not None else -1
                 det.error_x  = box.cx - 0.5
+
                 self._target_id   = box.track_id
                 self._target_miss = 0
+
+                recent_frames.append({'cx': box.cx, 'cy': box.cy, 'w': box.w, 'h': box.h, 'conf': box.conf})
+                if len(recent_frames) > max_buffer_size:
+                    recent_frames.pop(0)
             else:
+                det.detected = False
                 self._target_miss += 1
-                if self._target_miss >= 5:   # ~0.5 s at 10 fps before abandoning locked ID
+                if self._target_miss >= 5: # ~0.5 s at 10 fps before abandoning locked ID
                     self._target_id   = None
                     self._target_miss = 0
+                    recent_frames = []
+
             self.pub_det.publish(det)
-            self.pub_status.publish(String(data="detected" if box else "none"))
+            self.pub_status.publish(String(data="detected" if det.detected else "none"))
 
             if self.pub_img.get_num_connections() > 0:
-                self._publish_annotated(frame, header, box, w, h, det)
-            if self.pub_marker.get_num_connections() > 0:
-                self._publish_marker(header, box, det)
+                self._publish_annotated(frame, header, box if not is_outlier else None, w, h, det)
 
     def _publish_annotated(self, frame, header, box, w, h, det):
         annotated = frame.copy()
