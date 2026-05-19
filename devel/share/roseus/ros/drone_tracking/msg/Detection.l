@@ -1,1 +1,0 @@
-/home/zd/tracking_ws/devel/.private/drone_tracking/share/roseus/ros/drone_tracking/msg/Detection.l

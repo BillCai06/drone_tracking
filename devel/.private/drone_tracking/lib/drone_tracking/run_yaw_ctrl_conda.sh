@@ -1,1 +1,0 @@
-/home/zd/tracking_ws/src/drone_tracking/scripts/run_yaw_ctrl_conda.sh

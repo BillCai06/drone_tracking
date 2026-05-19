@@ -1,1 +1,0 @@
-/home/zd/tracking_ws/devel/.private/drone_tracking/share/common-lisp/ros/drone_tracking/msg/drone_tracking-msg.asd

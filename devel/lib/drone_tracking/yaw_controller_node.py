@@ -1,1 +1,0 @@
-/home/zd/tracking_ws/devel/.private/drone_tracking/lib/drone_tracking/yaw_controller_node.py
