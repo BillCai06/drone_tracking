@@ -2,7 +2,7 @@
 import sys
 import queue
 import threading
-
+import os
 import numpy as np
 # TensorRT 8.5.x uses np.bool/np.int/np.float which were removed in NumPy 1.24.
 # Patch before any tensorrt / ultralytics import.
@@ -13,16 +13,19 @@ np.complex= complex
 np.object = object
 np.str    = str
 
+
+SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPTS_DIR)
+sys.path.insert(0, os.path.join(SCRIPTS_DIR, "nms_ext"))
+
 import torch as _torch
 import cv2
 import rospy
 from cv_bridge import CvBridge
+import nms_ext as _nms_ext
 from sensor_msgs.msg import Image, CompressedImage
 from std_msgs.msg import String
 from visualization_msgs.msg import Marker
-
-SCOUT_PATH = "/home/zd/tracking_ws/src/Scout-Vision"
-sys.path.insert(0, SCOUT_PATH)
 
 from yolo_botsort import load_yolo_detector, get_best_detection
 from box_utils import yolo_xywh_to_xyxy_pixels
@@ -70,7 +73,15 @@ class DetectorNode:
                 iou = inter / (areas[i] + areas[rest] - inter + 1e-6)
                 order = rest[iou <= iou_threshold]
             return _torch.tensor(keep, dtype=_torch.long)
-        _tv.ops.nms = _nms_pure
+        def _nms_cuda_wrapper(boxes, scores, iou_threshold):
+            if boxes.numel() == 0:
+                return _torch.empty(0, dtype=_torch.long)
+            boxes_cuda  = boxes.float().cuda().contiguous()
+            scores_cuda = scores.float().cuda().contiguous()
+            keep_mask = _nms_ext.nms_cuda(boxes_cuda, scores_cuda, float(iou_threshold)).bool()
+            return _torch.where(keep_mask)[0].cpu()
+
+        _tv.ops.nms = _nms_cuda_wrapper
         rospy.loginfo("[detector] torchvision NMS patched with pure-PyTorch fallback")
 
         dummy = np.zeros((736, 1280, 3), dtype=np.uint8)
